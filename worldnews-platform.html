@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldNews.org — Global Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f2eb;
+    --cream: #ede9df;
+    --red: #c0392b;
+    --gold: #b8933a;
+    --steel: #4a5568;
+    --muted: #8a8070;
+    --rule: #c8c0b0;
+    --ad-bg: #f0ece2;
+    --sponsored: #e8f4e8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.6;
+  }
+
+  /* ── BREAKING TICKER ── */
+  .ticker-bar {
+    background: var(--red);
+    color: white;
+    padding: 6px 0;
+    overflow: hidden;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+  }
+  .ticker-label {
+    background: #8b0000;
+    padding: 6px 16px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.12em;
+  }
+  .ticker-scroll {
+    overflow: hidden;
+    flex: 1;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  }
+  .ticker-inner {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker 40s linear infinite;
+  }
+  .ticker-inner span { padding: 0 32px; opacity: 0.9; }
+  .ticker-inner span::before { content: '◆  '; opacity: 0.6; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 0 40px;
+    background: var(--paper);
+  }
+  .masthead-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 8px;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .masthead-top .edition { font-weight: 500; color: var(--steel); }
+  .masthead-logo {
+    text-align: center;
+    padding: 18px 0 14px;
+    position: relative;
+  }
+  .masthead-logo h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 7vw, 88px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .masthead-logo .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .masthead-logo .ornament {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .masthead-logo .ornament::before,
+  .masthead-logo .ornament::after {
+    content: '';
+    height: 1px;
+    width: 80px;
+    background: var(--ink);
+  }
+  .masthead-logo .ornament span {
+    font-size: 14px;
+    color: var(--red);
+  }
+
+  /* ── NAV ── */
+  nav {
+    border-top: 1px solid var(--rule);
+    padding: 0 40px;
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  nav a {
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 12px 18px;
+    white-space: nowrap;
+    border-right: 1px solid var(--rule);
+    transition: background 0.15s, color 0.15s;
+  }
+  nav a:first-child { border-left: 1px solid var(--rule); }
+  nav a:hover { background: var(--ink); color: var(--paper); }
+  nav a.active { background: var(--red); color: white; }
+
+  /* ── LEADERBOARD AD ── */
+  .ad-leaderboard {
+    background: var(--ad-bg);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--gold);
+    padding: 12px 20px;
+    margin: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 90px;
+    position: relative;
+  }
+  .ad-label {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .ad-leaderboard-content {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+  }
+  .ad-leaderboard .ad-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+  .ad-leaderboard .ad-text h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .ad-leaderboard .ad-text p {
+    font-size: 12px;
+    color: var(--steel);
+    margin-top: 2px;
+  }
+  .ad-cta {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 8px 20px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .ad-cta:hover { background: var(--red); }
+
+  /* ── MAIN LAYOUT ── */
+  .main-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px 60px;
+  }
+
+  /* ── HERO GRID ── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .hero-main {
+    border-right: 1px solid var(--rule);
+    padding: 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-main::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red), var(--gold));
+  }
+  .hero-kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-kicker::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--red);
+    opacity: 0.3;
+  }
+  .hero-main h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 3.5vw, 46px);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+  .hero-main h2 em {
+    font-style: italic;
+    color: var(--steel);
+  }
+  .hero-excerpt {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--steel);
+    max-width: 540px;
+    margin-bottom: 20px;
+  }
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .hero-meta .dot { color: var(--rule); }
+  .hero-meta .ai-tag {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red);
+    text-decoration: none;
+    border-bottom: 1px solid var(--red);
+    padding-bottom: 2px;
+    transition: gap 0.2s;
+  }
+  .read-more:hover { gap: 12px; }
+
+  /* ── SIDEBAR STACK ── */
+  .hero-sidebar { padding: 0; }
+  .sidebar-story {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .sidebar-story:hover { background: var(--cream); }
+  .sidebar-story:last-child { border-bottom: none; }
+  .sidebar-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--rule);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .sidebar-story h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .sidebar-story .story-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .sidebar-story .region-tag {
+    display: inline-block;
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    padding: 1px 6px;
+    font-size: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.08em;
+    color: var(--steel);
+    margin-bottom: 6px;
+  }
+
+  /* ── 3-COL NEWS GRID ── */
+  .section-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0 20px;
+  }
+  .section-rule h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    white-space: nowrap;
+    font-style: italic;
+  }
+  .section-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ink);
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+  .news-card {
+    padding: 24px;
+    border-right: 1px solid var(--rule);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .news-card:last-child { border-right: none; }
+  .news-card:hover { background: var(--cream); }
+  .news-card .category {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .news-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .news-card p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--steel);
+    margin-bottom: 14px;
+  }
+  .news-card .card-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .card-meta .ai-pill {
+    background: #e8f0e8;
+    color: #2d6a2d;
+    padding: 1px 6px;
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    border: 1px solid #b8d4b8;
+  }
+
+  /* ── SPONSORED CONTENT ── */
+  .sponsored-strip {
+    background: var(--sponsored);
+    border: 1px solid #c8dfc8;
+    border-left: 3px solid #4a9a4a;
+    padding: 20px 24px;
+    margin: 32px 0;
+    position: relative;
+  }
+  .sponsored-strip .ad-label { color: #4a9a4a; }
+  .sponsored-strip h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .sponsored-strip p { font-size: 13px; color: var(--steel); }
+  .sponsored-strip .sponsor-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+
+  /* ── 2+1 WORLD LAYOUT ── */
+  .world-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 320px;
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .world-col { border-right: 1px solid var(--rule); }
+  .world-col:last-child { border-right: none; }
+  .world-col-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 8px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .world-story {
+    padding: 20px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .world-story:last-child { border-bottom: none; }
+  .world-story h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .world-story p { font-size: 12.5px; line-height: 1.6; color: var(--steel); }
+  .world-story .ws-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ── AFFILIATE RAIL ── */
+  .affiliate-rail {
+    padding: 20px;
+  }
+  .affiliate-rail .rail-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .affiliate-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    cursor: pointer;
+  }
+  .affiliate-item:last-child { border-bottom: none; }
+  .affiliate-item .aff-category {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .affiliate-item h5 {
+    font-family: 'Playfair Display', serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .affiliate-item .aff-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--red);
+  }
+  .affiliate-item .aff-cta {
+    font-size: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── AI ENGINE STATUS ── */
+  .engine-status {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px 32px;
+    margin: 32px 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background-color: #333;
+    border: 1px solid var(--ink);
+  }
+  .stat-block {
+    background: var(--ink);
+    padding: 16px 24px;
+  }
+  .stat-block .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .stat-block .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--paper);
+  }
+  .stat-block .stat-unit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+  .pulse {
+    display: inline-block;
+    width: 7px; height: 7px;
+    background: #4caf50;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── RECTANGLE ADS ── */
+  .ad-rect {
+    background: var(--ad-bg);
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--gold);
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    text-align: center;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .ad-rect .ad-label { position: absolute; top: 6px; right: 8px; }
+  .ad-rect .ad-icon { font-size: 40px; }
+  .ad-rect h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .ad-rect p { font-size: 12px; color: var(--steel); line-height: 1.5; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: #999;
+    padding: 48px 40px 24px;
+    margin-top: 0;
+  }
+  .footer-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 24px;
+  }
+  .footer-brand h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--paper);
+    margin-bottom: 10px;
+  }
+  .footer-brand p { font-size: 12.5px; line-height: 1.7; color: #777; }
+  .footer-brand .ai-disclosure {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: #1a1a1a;
+    border-left: 2px solid var(--gold);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #666;
+    line-height: 1.6;
+  }
+  .footer-col h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--paper);
+    margin-bottom: 16px;
+  }
+  .footer-col a {
+    display: block;
+    font-size: 12.5px;
+    color: #777;
+    text-decoration: none;
+    margin-bottom: 8px;
+    transition: color 0.15s;
+  }
+  .footer-col a:hover { color: var(--paper); }
+  .footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #555;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-main { animation: fadeUp 0.5s ease both; }
+  .news-card:nth-child(1) { animation: fadeUp 0.5s 0.1s ease both; }
+  .news-card:nth-child(2) { animation: fadeUp 0.5s 0.2s ease both; }
+  .news-card:nth-child(3) { animation: fadeUp 0.5s 0.3s ease both; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-sidebar { border-top: 1px solid var(--rule); display: grid; grid-template-columns: repeat(2, 1fr); }
+    .news-grid { grid-template-columns: 1fr 1fr; }
+    .news-card:nth-child(2) { border-right: none; }
+    .world-layout { grid-template-columns: 1fr 1fr; }
+    .world-layout .affiliate-rail { display: none; }
+    .engine-status { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  @media (max-width: 640px) {
+    .masthead, nav, .main-wrap, footer { padding-left: 20px; padding-right: 20px; }
+    .ad-leaderboard { margin: 12px 20px; }
+    .news-grid { grid-template-columns: 1fr; }
+    .news-card { border-right: none; border-bottom: 1px solid var(--rule); }
+    .world-layout { grid-template-columns: 1fr; }
+    .engine-status { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BREAKING TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">BREAKING</div>
+  <div class="ticker-scroll">
+    <div class="ticker-inner">
+      <span>UN Security Council convenes emergency session over disputed maritime territory</span>
+      <span>Federal Reserve signals potential rate adjustment amid mixed economic signals</span>
+      <span>Major earthquake reported off coast of Japan — tsunami watch issued</span>
+      <span>European Parliament passes landmark digital rights legislation</span>
+      <span>WHO declares end to regional health emergency in Central Africa</span>
+      <span>Tech giants face new antitrust scrutiny from global regulators</span>
+      <span>UN Security Council convenes emergency session over disputed maritime territory</span>
+      <span>Federal Reserve signals potential rate adjustment amid mixed economic signals</span>
+      <span>Major earthquake reported off coast of Japan — tsunami watch issued</span>
+      <span>European Parliament passes landmark digital rights legislation</span>
+    </div>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-top">
+    <span class="edition">WEDNESDAY, MARCH 18, 2026 · DIGITAL EDITION</span>
+    <span>Est. 2025 · worldnews.org</span>
+    <span>Vol. 1, No. 47</span>
+  </div>
+  <div class="masthead-logo">
+    <h1>WorldNews</h1>
+    <div class="tagline">Autonomous Global Intelligence · AI-Aggregated · Continuously Updated</div>
+    <div class="ornament"><span>✦</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="active">Home</a>
+    <a href="#">Politics</a>
+    <a href="#">Economy</a>
+    <a href="#">Conflict</a>
+    <a href="#">Climate</a>
+    <a href="#">Technology</a>
+    <a href="#">Science</a>
+    <a href="#">Health</a>
+    <a href="#">Business</a>
+    <a href="#">Opinion</a>
+  </div>
+</nav>
+
+<!-- LEADERBOARD AD (728×90 placeholder) -->
+<div class="ad-leaderboard">
+  <span class="ad-label">Advertisement</span>
+  <div class="ad-leaderboard-content">
+    <div class="ad-icon">📊</div>
+    <div class="ad-text">
+      <h4>Markets Intelligence Pro — 30 Days Free</h4>
+      <p>Real-time data, AI-powered analysis, and institutional-grade research tools for serious investors.</p>
+    </div>
+    <a href="#" class="ad-cta">Start Free Trial →</a>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-wrap">
+
+  <!-- HERO GRID -->
+  <div class="hero-grid">
+    <div class="hero-main">
+      <div class="hero-kicker">Top Story · World Affairs</div>
+      <h2>G7 Leaders Reach <em>Landmark Agreement</em> on AI Governance and Global Digital Standards</h2>
+      <p class="hero-excerpt">In a pivotal summit communiqué, leaders of the world's seven largest economies have endorsed a binding framework for artificial intelligence regulation — setting minimum transparency requirements, liability standards, and cross-border enforcement mechanisms that will reshape the technology landscape across three continents.</p>
+      <div class="hero-meta">
+        <span class="ai-tag">AI WRITTEN</span>
+        <span>3 min read</span>
+        <span class="dot">·</span>
+        <span>Sources: Reuters, AP, BBC</span>
+        <span class="dot">·</span>
+        <span>Updated 14 min ago</span>
+      </div>
+      <a href="#" class="read-more">Read Full Story →</a>
+    </div>
+    <div class="hero-sidebar">
+      <div class="sidebar-story">
+        <div class="sidebar-num">02</div>
+        <span class="region-tag">MIDDLE EAST</span>
+        <h3>Ceasefire Talks Resume in Geneva Amid Renewed Diplomatic Pressure</h3>
+        <div class="story-meta">22 min ago · 4 min read</div>
+      </div>
+      <div class="sidebar-story">
+        <div class="sidebar-num">03</div>
+        <span class="region-tag">ECONOMY</span>
+        <h3>IMF Revises Global Growth Forecast Downward for Third Consecutive Quarter</h3>
+        <div class="story-meta">41 min ago · 3 min read</div>
+      </div>
+      <div class="sidebar-story">
+        <div class="sidebar-num">04</div>
+        <span class="region-tag">CLIMATE</span>
+        <h3>Arctic Sea Ice Hits Record Low as Scientists Warn of Feedback Loop Acceleration</h3>
+        <div class="story-meta">1 hr ago · 5 min read</div>
+      </div>
+      <div class="sidebar-story">
+        <div class="sidebar-num">05</div>
+        <span class="region-tag">TECHNOLOGY</span>
+        <h3>Semiconductor Alliance Announces $200B Investment Fund Targeting Sovereign Supply Chains</h3>
+        <div class="story-meta">2 hr ago · 3 min read</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI ENGINE STATUS BAR -->
+  <div class="engine-status">
+    <div class="stat-block">
+      <div class="stat-label"><span class="pulse"></span>AI Engine Status</div>
+      <div class="stat-value">LIVE</div>
+      <div class="stat-unit">Publishing every 12 minutes</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-label">Stories Published Today</div>
+      <div class="stat-value">247</div>
+      <div class="stat-unit">Across 9 categories</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-label">RSS Sources Monitored</div>
+      <div class="stat-value">184</div>
+      <div class="stat-unit">Global feeds · 47 countries</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-label">Est. Revenue Today</div>
+      <div class="stat-value">$124</div>
+      <div class="stat-unit">Ads + affiliate combined</div>
+    </div>
+  </div>
+
+  <!-- WORLD NEWS 3-COL -->
+  <div class="section-rule"><h2>World Reports</h2></div>
+  <div class="news-grid">
+    <div class="news-card">
+      <div class="category">Europe · Politics</div>
+      <h3>French Parliament Survives Confidence Vote in Narrow Coalition Manoeuvre</h3>
+      <p>The minority government secured a fragile majority after weeks of negotiations with centrist opposition factions, averting what would have been the third snap election in 18 months.</p>
+      <div class="card-meta">
+        <span class="ai-pill">AI WRITTEN</span>
+        <span>1 hr ago</span>
+        <span>·</span>
+        <span>4 min read</span>
+      </div>
+    </div>
+    <div class="news-card">
+      <div class="category">Asia · Economy</div>
+      <h3>China's Manufacturing PMI Rises Unexpectedly, Defying Analyst Consensus</h3>
+      <p>Official data showed factory activity expanding at the fastest pace in seven months, suggesting that Beijing's fiscal stimulus package may be filtering through to the real economy sooner than projected.</p>
+      <div class="card-meta">
+        <span class="ai-pill">AI WRITTEN</span>
+        <span>2 hr ago</span>
+        <span>·</span>
+        <span>3 min read</span>
+      </div>
+    </div>
+    <div class="news-card">
+      <div class="category">Americas · Science</div>
+      <h3>NASA Confirms Evidence of Subsurface Liquid Water on Europa in New Findings</h3>
+      <p>Data returned from the Clipper mission has provided the strongest indication yet that a vast ocean exists beneath the ice shell of Jupiter's moon — reigniting discussion about the prospects for extraterrestrial life.</p>
+      <div class="card-meta">
+        <span class="ai-pill">AI WRITTEN</span>
+        <span>3 hr ago</span>
+        <span>·</span>
+        <span>6 min read</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPONSORED CONTENT -->
+  <div class="sponsored-strip">
+    <span class="ad-label">Sponsored Content</span>
+    <h3>How Global Leaders Are Using AI to Navigate Geopolitical Risk in 2026</h3>
+    <p>Oxford Analytica's latest executive briefing reveals how Fortune 500 boards are restructuring risk committees and integrating real-time intelligence platforms into strategic decision-making.</p>
+    <div class="sponsor-logo">Presented by Oxford Analytica Intelligence Solutions</div>
+  </div>
+
+  <!-- WORLD REGIONS + AFFILIATE RAIL -->
+  <div class="section-rule"><h2>By Region</h2></div>
+  <div class="world-layout">
+    <div class="world-col">
+      <div class="world-col-header">⬛ Africa & Middle East</div>
+      <div class="world-story">
+        <h4>Sudan Humanitarian Crisis Deepens as Aid Corridors Remain Blocked</h4>
+        <p>International relief organisations warn that over 2.4 million people face acute food insecurity as fighting continues to disrupt supply chains along key northern routes.</p>
+        <div class="ws-meta"><span>Reuters</span><span>·</span><span>4 hr ago</span></div>
+      </div>
+      <div class="world-story">
+        <h4>Saudi Arabia Accelerates $500B NEOM Project Timeline Under New Directives</h4>
+        <p>Crown Prince reaffirms commitment to the megacity project with revised completion targets and new international contractor agreements signed in Riyadh.</p>
+        <div class="ws-meta"><span>Bloomberg</span><span>·</span><span>5 hr ago</span></div>
+      </div>
+      <div class="world-story">
+        <h4>Nigeria's Central Bank Raises Rates to Combat Persistent Inflationary Pressure</h4>
+        <p>The 150 basis point hike marks the fourth consecutive increase this cycle and sends the naira to a three-month high against the dollar.</p>
+        <div class="ws-meta"><span>FT</span><span>·</span><span>6 hr ago</span></div>
+      </div>
+    </div>
+    <div class="world-col">
+      <div class="world-col-header">⬛ Asia Pacific</div>
+      <div class="world-story">
+        <h4>Taiwan Strait Tensions Ease as US and Beijing Restart Military Hotline Talks</h4>
+        <p>Senior defence officials met in Singapore for the first direct exchange in eight months, with both sides emphasising the importance of risk-reduction protocols.</p>
+        <div class="ws-meta"><span>AP</span><span>·</span><span>3 hr ago</span></div>
+      </div>
+      <div class="world-story">
+        <h4>India Overtakes Germany to Become World's Third-Largest Auto Market</h4>
+        <p>Annual vehicle sales data confirms the milestone, driven by surging middle-class demand and a rapidly expanding EV segment backed by government incentives.</p>
+        <div class="ws-meta"><span>WSJ</span><span>·</span><span>5 hr ago</span></div>
+      </div>
+      <div class="world-story">
+        <h4>South Korea and Japan Sign Historic Defence Cooperation Pact</h4>
+        <p>Decades of historical tension gave way to pragmatic security imperatives as both nations formalised intelligence-sharing and joint naval exercise frameworks.</p>
+        <div class="ws-meta"><span>NHK</span><span>·</span><span>7 hr ago</span></div>
+      </div>
+    </div>
+    <div class="world-col">
+      <div class="affiliate-rail">
+        <div class="rail-header">
+          <span>Recommended</span>
+          <span style="color:var(--gold);">Sponsored ↗</span>
+        </div>
+        <div class="affiliate-item">
+          <div class="aff-category">📚 Books</div>
+          <h5>The New Geopolitics: Power Shifts in a Fragmented World</h5>
+          <div class="aff-price">$28.99</div>
+          <div class="aff-cta">Buy on Amazon →</div>
+        </div>
+        <div class="affiliate-item">
+          <div class="aff-category">🌐 VPN</div>
+          <h5>NordVPN — Access Global News Without Restrictions</h5>
+          <div class="aff-price">From $3.99/mo</div>
+          <div class="aff-cta">Get 64% Off →</div>
+        </div>
+        <div class="affiliate-item">
+          <div class="aff-category">📰 Subscription</div>
+          <h5>The Economist — 12 Weeks For $12</h5>
+          <div class="aff-price">Special Offer</div>
+          <div class="aff-cta">Subscribe Now →</div>
+        </div>
+        <div class="affiliate-item">
+          <div class="aff-category">📈 Finance</div>
+          <h5>Seeking Alpha Premium — Beat the Market</h5>
+          <div class="aff-price">$19.99/mo</div>
+          <div class="aff-cta">Try Free 14 Days →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECOND 3-COL GRID -->
+  <div class="section-rule"><h2>Technology & Business</h2></div>
+  <div class="news-grid">
+    <div class="news-card">
+      <div class="category">Technology · AI</div>
+      <h3>Open-Source AI Models Surpass Commercial Benchmarks for the First Time</h3>
+      <p>A coalition of academic institutions has released a foundational model that outperforms leading commercial alternatives on reasoning and code generation tasks, democratising access to frontier AI capabilities.</p>
+      <div class="card-meta">
+        <span class="ai-pill">AI WRITTEN</span>
+        <span>5 hr ago</span>
+        <span>·</span>
+        <span>5 min read</span>
+      </div>
+    </div>
+    <div class="news-card">
+      <div class="category">Business · Energy</div>
+      <h3>BP and Shell Report Record Renewable Revenue as Oil Majors Pivot Their Core Strategies</h3>
+      <p>Both companies disclosed that clean energy divisions now account for more than 30% of total revenues — a threshold once considered a decade away by industry analysts.</p>
+      <div class="card-meta">
+        <span class="ai-pill">AI WRITTEN</span>
+        <span>6 hr ago</span>
+        <span>·</span>
+        <span>4 min read</span>
+      </div>
+    </div>
+    <div class="news-card">
+      <div class="category">Health · Science</div>
+      <h3>mRNA Vaccine Platform Shows 94% Efficacy Against Novel Respiratory Pathogen in Phase III Trial</h3>
+      <p>Results published in the New England Journal of Medicine confirm that the platform's rapid-response design allows effective vaccines to be produced within six weeks of pathogen identification.</p>
+      <div class="card-meta">
+        <span class="ai-pill">AI WRITTEN</span>
+        <span>8 hr ago</span>
+        <span>·</span>
+        <span>6 min read</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h3>WorldNews.org</h3>
+      <p>An autonomous AI-powered news aggregation platform monitoring over 180 global RSS feeds across 47 countries. Stories are aggregated, synthesised, and rewritten by AI every 12 minutes.</p>
+      <div class="ai-disclosure">
+        AI DISCLOSURE: All content on this site is generated by artificial intelligence from publicly available news sources. WorldNews.org does not employ journalists. Sources are cited within each article. For corrections, contact editorial@worldnews.org.
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Sections</h4>
+      <a href="#">Politics</a>
+      <a href="#">Economy</a>
+      <a href="#">Conflict & Security</a>
+      <a href="#">Climate & Environment</a>
+      <a href="#">Technology</a>
+      <a href="#">Health & Science</a>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <a href="#">About WorldNews</a>
+      <a href="#">AI Methodology</a>
+      <a href="#">Source Directory</a>
+      <a href="#">Advertise With Us</a>
+      <a href="#">Sponsored Content</a>
+      <a href="#">Affiliate Disclosure</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+      <a href="#">GDPR / CCPA</a>
+      <a href="#">AI Content Policy</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 WorldNews.org · All Rights Reserved</span>
+    <span>AI-POWERED · AUTONOMOUS PUBLISHING · CONTINUOUSLY UPDATED</span>
+    <span>worldnews.org</span>
+  </div>
+</footer>
+
+</body>
+</html>
